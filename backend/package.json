@@ -1,7 +1,7 @@
 {
   "name": "spotify-lite-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
@@ -9,12 +9,24 @@
     "view:data": "node viewDbData.js",
     "seed:data": "node seedData.js",
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "echo 'No build step needed for Node.js backend'"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "music",
+    "spotify",
+    "api",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "Your Name",
   "license": "ISC",
-  "description": "",
+  "description": "A full-stack music application with a Node.js/Express backend and React frontend",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
   "dependencies": {
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",

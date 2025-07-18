@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5001";
+// Use relative URL for Vercel deployment
+const API_BASE_URL =
+  process.env.NODE_ENV === "production" ? "/api" : "http://localhost:5001";
 
 // Create axios instance
 const api = axios.create({
@@ -15,7 +17,7 @@ export const apiService = {
   // Song APIs
   searchSongs: async (query, genre, language) => {
     const params = {};
-    if (query) params.search = query; // 改为 search 参数
+    if (query) params.search = query;
     if (genre) params.genre = genre;
     if (language) params.language = language;
 

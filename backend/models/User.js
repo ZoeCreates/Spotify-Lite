@@ -87,6 +87,7 @@ const userSchema = new mongoose.Schema(
             "Classical",
             "Alternative",
             "Indie",
+            "Latin",
           ],
         },
       ],

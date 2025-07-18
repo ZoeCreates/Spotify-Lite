@@ -27,6 +27,7 @@ const artistSchema = new mongoose.Schema(
           "Classical",
           "Alternative",
           "Indie",
+          "Latin",
         ],
         message: "{VALUE} is not a valid genre",
       },
@@ -39,15 +40,16 @@ const artistSchema = new mongoose.Schema(
       maxlength: [1000, "Bio cannot exceed 1000 characters"],
     },
 
-    // Profile image URL
+    // Profile image URL or local path
     profileImage: {
       type: String,
       default: "https://via.placeholder.com/200x200?text=Artist",
       validate: {
         validator: function (v) {
-          return /^https?:\/\/.+/.test(v);
+          return /^https?:\/\/.+/.test(v) || /^\/images\/.+/.test(v);
         },
-        message: "Profile image must be a valid URL",
+        message:
+          "Profile image must be a valid URL or local path starting with /images/",
       },
     },
 

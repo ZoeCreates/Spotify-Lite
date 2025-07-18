@@ -34,6 +34,7 @@ const songSchema = new mongoose.Schema(
           "Classical",
           "Alternative",
           "Indie",
+          "Latin",
         ],
         message: "{VALUE} is not a valid genre",
       },
@@ -68,15 +69,16 @@ const songSchema = new mongoose.Schema(
       max: [3600, "Duration cannot exceed 1 hour"],
     },
 
-    // Album cover image URL
+    // Album cover image URL or local path
     albumCover: {
       type: String,
       default: "https://via.placeholder.com/300x300?text=Album+Cover",
       validate: {
         validator: function (v) {
-          return /^https?:\/\/.+/.test(v);
+          return /^https?:\/\/.+/.test(v) || /^\/images\/.+/.test(v);
         },
-        message: "Album cover must be a valid URL",
+        message:
+          "Album cover must be a valid URL or local path starting with /images/",
       },
     },
 

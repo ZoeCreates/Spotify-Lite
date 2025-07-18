@@ -26,11 +26,10 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Routes
-// app.use("/auth", require("./routes/authRoutes")); // Removed auth routes
-app.use("/user", require("./routes/userRoutes"));
-app.use("/songs", require("./routes/songRoutes"));
-app.use("/artists", require("./routes/artistRoutes"));
+// Routes with API prefix
+app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/songs", require("./routes/songRoutes"));
+app.use("/api/artists", require("./routes/artistRoutes"));
 
 // 404 handler for undefined routes
 app.use("*", (req, res) => {
