@@ -5,9 +5,11 @@ const Song = require("./models/Song");
 
 const seedData = async () => {
   try {
-    // Connect to database
-    await mongoose.connect("mongodb://localhost:27017/spotify-lite");
-    console.log("🔍 Connected to database: spotify-lite\n");
+    // Connect to database using environment variable
+    await mongoose.connect(
+      process.env.MONGODB_URI || "mongodb://localhost:27017/spotify-lite"
+    );
+    console.log("🔍 Connected to database for seeding\n");
 
     // Clear existing data
     await User.deleteMany({});

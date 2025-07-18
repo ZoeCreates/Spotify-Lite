@@ -124,3 +124,5 @@ coverage/
 # Package lock files (optional - you might want to keep these)
 # package-lock.json
 # yarn.lock 
+.vercel
+.env*.local
