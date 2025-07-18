@@ -26,6 +26,22 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Root endpoint
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Spotify Lite API",
+    version: "1.0.0",
+    endpoints: {
+      health: "/health",
+      users: "/api/user",
+      songs: "/api/songs",
+      artists: "/api/artists",
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Routes with API prefix
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/songs", require("./routes/songRoutes"));
