@@ -152,10 +152,33 @@ const getUserInfo = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Get all users
+ * @route   GET /user
+ * @access  Public
+ */
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+
+    res.json({
+      status: "success",
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getUserLikedSongs,
   updateUserInfo,
   getFirstAvailableUser,
   getUserByUsername,
   getUserInfo,
+  getAllUsers,
 };

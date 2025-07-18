@@ -4,11 +4,15 @@ const {
   getUserLikedSongs,
   updateUserInfo,
   getUserInfo,
+  getAllUsers,
 } = require("../controllers/userController");
 
 // ============================================================================
 // USER ROUTES (as per project requirements)
 // ============================================================================
+
+// GET /user - Get all users
+router.get("/", getAllUsers);
 
 // GET /user/songs - Get all songs liked by a specific user
 router.get("/songs", getUserLikedSongs);
