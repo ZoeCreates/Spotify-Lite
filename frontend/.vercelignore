@@ -1,0 +1,8 @@
+../backend/
+../node_modules/
+../.git/
+../README.md
+../DEPLOYMENT.md
+../VERCEL_DEPLOYMENT.md
+node_modules/
+.git/ 
