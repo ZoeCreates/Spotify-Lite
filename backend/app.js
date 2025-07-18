@@ -34,18 +34,18 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       health: "/health",
-      users: "/api/user",
-      songs: "/api/songs",
-      artists: "/api/artists",
+      users: "/user",
+      songs: "/songs",
+      artists: "/artists",
     },
     timestamp: new Date().toISOString(),
   });
 });
 
-// Routes with API prefix
-app.use("/api/user", require("./routes/userRoutes"));
-app.use("/api/songs", require("./routes/songRoutes"));
-app.use("/api/artists", require("./routes/artistRoutes"));
+// Routes without API prefix
+app.use("/user", require("./routes/userRoutes"));
+app.use("/songs", require("./routes/songRoutes"));
+app.use("/artists", require("./routes/artistRoutes"));
 
 // 404 handler for undefined routes
 app.use("*", (req, res) => {
