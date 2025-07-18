@@ -37,6 +37,5 @@
       "dest": "/index.html"
     }
   ],
-  "functions": {},
   "outputDirectory": "build"
 }
