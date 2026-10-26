@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Favorite, FavoriteBorder, PersonAdd } from "@mui/icons-material";
 import { apiService } from "../services/api";
+import { placeholderImage, fallbackOnError } from "../services/placeholder";
 
 const SongCard = ({ song, onLike, onFollowArtist }) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -64,11 +65,9 @@ const SongCard = ({ song, onLike, onFollowArtist }) => {
       <CardMedia
         component="img"
         height="200"
-        image={
-          song.albumCover ||
-          "https://via.placeholder.com/300x300?text=Album+Cover"
-        }
+        image={song.albumCover || placeholderImage(song.title)}
         alt={song.title}
+        onError={fallbackOnError(song.title)}
         sx={{ objectFit: "cover" }}
       />
       <CardContent>

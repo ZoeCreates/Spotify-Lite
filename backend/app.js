@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const cors = require("cors");
 const errorHandler = require("./middleware/errorHandler");
@@ -15,6 +17,13 @@ if (process.env.NODE_ENV === "development") {
     console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
     next();
   });
+}
+
+// Serve the built React app when it has been copied next to the server
+const publicDir = path.join(__dirname, "public");
+const hasFrontend = fs.existsSync(path.join(publicDir, "index.html"));
+if (hasFrontend) {
+  app.use(express.static(publicDir));
 }
 
 // Health check endpoint
@@ -46,6 +55,14 @@ app.get("/", (req, res) => {
 app.use("/user", require("./routes/userRoutes"));
 app.use("/songs", require("./routes/songRoutes"));
 app.use("/artists", require("./routes/artistRoutes"));
+
+// Client-side routes (React Router) fall back to index.html
+if (hasFrontend) {
+  app.get("*", (req, res, next) => {
+    if (!req.accepts("html")) return next();
+    res.sendFile(path.join(publicDir, "index.html"));
+  });
+}
 
 // 404 handler for undefined routes
 app.use("*", (req, res) => {

@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { Person, PersonRemove, MusicNote } from "@mui/icons-material";
 import { apiService } from "../services/api";
+import { placeholderImage, fallbackOnError } from "../services/placeholder";
 
 const FollowedArtists = () => {
   const [followedArtists, setFollowedArtists] = useState([]);
@@ -124,11 +125,9 @@ const FollowedArtists = () => {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={
-                      artist.profileImage ||
-                      "https://via.placeholder.com/300x300?text=Artist"
-                    }
+                    image={artist.profileImage || placeholderImage(artist.name)}
                     alt={artist.name}
+                    onError={fallbackOnError(artist.name)}
                     sx={{ objectFit: "cover" }}
                   />
                   <CardContent>

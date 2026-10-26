@@ -1,7 +1,9 @@
 import axios from "axios";
 
-// Use environment variable for API URL in production, localhost for development
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+// REACT_APP_API_URL wins when set (an empty string means same-origin, used when
+// the Express server also serves this build); otherwise localhost for development.
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ?? "http://localhost:5001";
 
 // Create axios instance
 const api = axios.create({
