@@ -6,6 +6,9 @@ const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
+// Behind Railway's proxy, so rate limiting sees the real client IP
+app.set("trust proxy", 1);
+
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -43,6 +46,7 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       health: "/health",
+      auth: "/auth",
       users: "/user",
       songs: "/songs",
       artists: "/artists",
@@ -52,6 +56,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes without API prefix
+app.use("/auth", require("./routes/authRoutes"));
 app.use("/user", require("./routes/userRoutes"));
 app.use("/songs", require("./routes/songRoutes"));
 app.use("/artists", require("./routes/artistRoutes"));

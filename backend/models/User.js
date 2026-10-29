@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+
+const BCRYPT_ROUNDS = 12;
 
 const userSchema = new mongoose.Schema(
   {
@@ -26,10 +29,12 @@ const userSchema = new mongoose.Schema(
       ],
     },
 
+    // Stored as a bcrypt hash and never returned by queries unless selected explicitly
     password: {
       type: String,
       required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"],
+      minlength: [8, "Password must be at least 8 characters"],
+      select: false,
     },
 
     // User profile information
@@ -135,6 +140,25 @@ userSchema.index({ followedArtists: 1 });
 // Virtual for full name
 userSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`.trim();
+});
+
+// Hash the password whenever it is set or changed
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, BCRYPT_ROUNDS);
+});
+
+// Instance method to check a plaintext password against the stored hash
+userSchema.methods.comparePassword = function (candidate) {
+  return bcrypt.compare(candidate, this.password);
+};
+
+// Never serialize the password hash, even when it was selected
+userSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    delete ret.password;
+    return ret;
+  },
 });
 
 // Instance method to check if user likes a song

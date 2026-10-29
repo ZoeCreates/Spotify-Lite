@@ -2,34 +2,18 @@ const Artist = require("../models/Artist");
 const User = require("../models/User");
 
 // ============================================================================
-// HARDCODED USER ID FOR TESTING (as per project requirements)
-// ============================================================================
-
-// Helper function to get the first available user (for demo purposes)
-const getFirstAvailableUser = async () => {
-  const user = await User.findOne().select("_id username");
-  if (!user) {
-    throw new Error(
-      "No users found in database. Please run seedData.js first."
-    );
-  }
-  console.log(`Using user: ${user.username} (${user._id})`);
-  return user._id;
-};
-
-// ============================================================================
 // ARTIST OPERATIONS (as per project requirements)
 // ============================================================================
 
 /**
  * @desc    User follows an artist
  * @route   PUT /artists
- * @access  Public
+ * @access  Private
  */
 const followArtist = async (req, res) => {
   try {
-    // Get user ID dynamically
-    const userId = await getFirstAvailableUser();
+    // requireAuth guarantees req.user is the logged-in user
+    const userId = req.user._id;
     const { artistId } = req.body;
 
     if (!artistId) {
@@ -100,12 +84,12 @@ const followArtist = async (req, res) => {
 /**
  * @desc    Get user's followed artists with full details
  * @route   GET /artists/followed
- * @access  Public
+ * @access  Private
  */
 const getFollowedArtists = async (req, res) => {
   try {
-    // Get user ID dynamically
-    const userId = await getFirstAvailableUser();
+    // requireAuth guarantees req.user is the logged-in user
+    const userId = req.user._id;
 
     const user = await User.findById(userId)
       .populate("followedArtists")
@@ -138,5 +122,4 @@ const getFollowedArtists = async (req, res) => {
 module.exports = {
   followArtist,
   getFollowedArtists,
-  getFirstAvailableUser,
 };

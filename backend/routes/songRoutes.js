@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { searchSongs, likeSong } = require("../controllers/songController");
+const { requireAuth } = require("../middleware/auth");
 
 // ============================================================================
 // SONG ROUTES (as per project requirements)
@@ -10,6 +11,6 @@ const { searchSongs, likeSong } = require("../controllers/songController");
 router.get("/", searchSongs);
 
 // PUT /songs - User likes a song
-router.put("/", likeSong);
+router.put("/", requireAuth, likeSong);
 
 module.exports = router;

@@ -11,6 +11,8 @@ import Search from "./pages/Search";
 import UserProfile from "./pages/UserProfile";
 import LikedSongs from "./pages/LikedSongs";
 import FollowedArtists from "./pages/FollowedArtists";
+import Login from "./pages/Login";
+import { AuthProvider, RequireAuth } from "./auth/AuthContext";
 
 // Create theme
 const theme = createTheme({
@@ -37,18 +39,30 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
+        <AuthProvider>
         <div className="App">
           <Navbar />
           <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<Search />} />
-              <Route path="/profile" element={<UserProfile />} />
-              <Route path="/liked-songs" element={<LikedSongs />} />
-              <Route path="/followed-artists" element={<FollowedArtists />} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/profile"
+                element={<RequireAuth><UserProfile /></RequireAuth>}
+              />
+              <Route
+                path="/liked-songs"
+                element={<RequireAuth><LikedSongs /></RequireAuth>}
+              />
+              <Route
+                path="/followed-artists"
+                element={<RequireAuth><FollowedArtists /></RequireAuth>}
+              />
             </Routes>
           </Container>
         </div>
+        </AuthProvider>
       </Router>
     </ThemeProvider>
   );

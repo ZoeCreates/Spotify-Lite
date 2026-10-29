@@ -1,51 +1,19 @@
 const User = require("../models/User");
 
 // ============================================================================
-// DYNAMIC USER ID MANAGEMENT
-// ============================================================================
-
-// Helper function to get the first available user (for demo purposes)
-const getFirstAvailableUser = async () => {
-  const user = await User.findOne().select("_id username");
-  if (!user) {
-    throw new Error(
-      "No users found in database. Please run seedData.js first."
-    );
-  }
-  console.log(`Using user: ${user.username} (${user._id})`);
-  return user._id;
-};
-
-// Helper function to get user by username
-const getUserByUsername = async (username) => {
-  const user = await User.findOne({ username }).select("_id username");
-  if (!user) {
-    throw new Error(`User with username '${username}' not found.`);
-  }
-  console.log(`Using user: ${user.username} (${user._id})`);
-  return user._id;
-};
-
-// ============================================================================
 // USER OPERATIONS (as per project requirements)
+// All routes run behind requireAuth, so req.user is the logged-in user and a
+// request can only read or change that user's own data.
 // ============================================================================
 
 /**
- * @desc    Get all songs liked by a specific user
+ * @desc    Get all songs liked by the logged-in user
  * @route   GET /user/songs
- * @access  Public
+ * @access  Private
  */
 const getUserLikedSongs = async (req, res) => {
   try {
-    // Get user ID dynamically - you can specify username in query params or use first available user
-    let userId;
-    if (req.query.username) {
-      userId = await getUserByUsername(req.query.username);
-    } else {
-      userId = await getFirstAvailableUser();
-    }
-
-    const user = await User.findById(userId)
+    const user = await User.findById(req.user._id)
       .populate({
         path: "likedSongs",
         populate: {
@@ -77,37 +45,27 @@ const getUserLikedSongs = async (req, res) => {
 /**
  * @desc    User updates profile info (username, email, password)
  * @route   PUT /user/info
- * @access  Public
+ * @access  Private
  */
 const updateUserInfo = async (req, res) => {
   try {
-    // Get user ID dynamically - you can specify username in query params or use first available user
-    let userId;
-    if (req.query.username) {
-      userId = await getUserByUsername(req.query.username);
-    } else {
-      userId = await getFirstAvailableUser();
-    }
-
     const { username, email, password } = req.body;
 
-    // Build update object (only include provided fields)
-    const updateData = {};
-    if (username) updateData.username = username;
-    if (email) updateData.email = email;
-    if (password) updateData.password = password;
-
-    const user = await User.findByIdAndUpdate(userId, updateData, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
-
+    // Load and save the document (instead of findByIdAndUpdate) so the
+    // pre-save hook hashes a new password
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({
         status: "error",
         message: "User not found",
       });
     }
+
+    if (typeof username === "string" && username) user.username = username;
+    if (typeof email === "string" && email) user.email = email;
+    if (typeof password === "string" && password) user.password = password;
+
+    await user.save();
 
     res.json({
       status: "success",
@@ -131,35 +89,25 @@ const updateUserInfo = async (req, res) => {
   }
 };
 
-// 获取当前用户信息
+/**
+ * @desc    Get the logged-in user's profile info
+ * @route   GET /user/info
+ * @access  Private
+ */
 const getUserInfo = async (req, res) => {
-  try {
-    let userId;
-    if (req.query.username) {
-      userId = await getUserByUsername(req.query.username);
-    } else {
-      userId = await getFirstAvailableUser();
-    }
-    const user = await User.findById(userId).select("-password");
-    if (!user) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "User not found" });
-    }
-    res.json({ status: "success", data: user });
-  } catch (error) {
-    res.status(500).json({ status: "error", message: error.message });
-  }
+  res.json({ status: "success", data: req.user });
 };
 
 /**
- * @desc    Get all users
+ * @desc    Get all users (public profile fields only)
  * @route   GET /user
- * @access  Public
+ * @access  Private
  */
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password");
+    const users = await User.find().select(
+      "username firstName lastName profilePicture"
+    );
 
     res.json({
       status: "success",
@@ -177,8 +125,6 @@ const getAllUsers = async (req, res) => {
 module.exports = {
   getUserLikedSongs,
   updateUserInfo,
-  getFirstAvailableUser,
-  getUserByUsername,
   getUserInfo,
   getAllUsers,
 };

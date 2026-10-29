@@ -6,15 +6,19 @@ const {
   getUserInfo,
   getAllUsers,
 } = require("../controllers/userController");
+const { requireAuth } = require("../middleware/auth");
+
+// Every user route acts on the logged-in user
+router.use(requireAuth);
 
 // ============================================================================
 // USER ROUTES (as per project requirements)
 // ============================================================================
 
-// GET /user - Get all users
+// GET /user - Get all users (public profile fields)
 router.get("/", getAllUsers);
 
-// GET /user/songs - Get all songs liked by a specific user
+// GET /user/songs - Get all songs liked by the logged-in user
 router.get("/songs", getUserLikedSongs);
 
 // PUT /user/info - User updates profile info (username, email, password)

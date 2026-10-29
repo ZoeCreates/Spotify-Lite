@@ -3,22 +3,6 @@ const User = require("../models/User");
 const Artist = require("../models/Artist");
 
 // ============================================================================
-// HARDCODED USER ID FOR TESTING (as per project requirements)
-// ============================================================================
-
-// Helper function to get the first available user (for demo purposes)
-const getFirstAvailableUser = async () => {
-  const user = await User.findOne().select("_id username");
-  if (!user) {
-    throw new Error(
-      "No users found in database. Please run seedData.js first."
-    );
-  }
-  console.log(`Using user: ${user.username} (${user._id})`);
-  return user._id;
-};
-
-// ============================================================================
 // SONG OPERATIONS (as per project requirements)
 // ============================================================================
 
@@ -71,12 +55,12 @@ const searchSongs = async (req, res) => {
 /**
  * @desc    User likes a song
  * @route   PUT /songs
- * @access  Public
+ * @access  Private
  */
 const likeSong = async (req, res) => {
   try {
-    // Get user ID dynamically
-    const userId = await getFirstAvailableUser();
+    // requireAuth guarantees req.user is the logged-in user
+    const userId = req.user._id;
     const { songId } = req.body;
 
     if (!songId) {
@@ -136,5 +120,4 @@ const likeSong = async (req, res) => {
 module.exports = {
   searchSongs,
   likeSong,
-  getFirstAvailableUser,
 };

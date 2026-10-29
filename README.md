@@ -7,12 +7,13 @@ A full-stack music application with a Node.js/Express backend and React frontend
 ### Backend (Node.js + Express + MongoDB)
 
 - **Song Management**: Search songs by title, artist, genre, and language
-- **User System**: Dynamic user management with profile updates
+- **Authentication**: JWT login and sign-up with bcrypt-hashed passwords
+- **User System**: Profile updates scoped to the logged-in user
 - **Like System**: Like/unlike songs functionality
 - **Artist Following**: Follow/unfollow artists
 - **RESTful API**: Clean API endpoints for all operations
 - **Database**: MongoDB with Mongoose ODM
-- **Testing**: Jest + Supertest for API testing
+- **Testing**: Jest + Supertest API tests on an in-memory MongoDB
 
 ### Frontend (React + Material-UI)
 
@@ -102,19 +103,29 @@ spotify-lite-backend/
 
 ## 🎯 API Endpoints
 
+Routes marked 🔒 need an `Authorization: Bearer <token>` header.
+
+### Auth
+
+- `POST /auth/register` - Create an account, returns a JWT
+- `POST /auth/login` - Log in with username or email, returns a JWT
+- `GET /auth/me` 🔒 - Current user
+
 ### Songs
 
 - `GET /songs/search` - Search songs with filters
-- `PUT /songs` - Like/unlike a song
+- `PUT /songs` 🔒 - Like a song
 
 ### Artists
 
-- `PUT /artists` - Follow/unfollow an artist
+- `GET /artists/followed` 🔒 - Followed artists
+- `PUT /artists` 🔒 - Follow an artist
 
 ### Users
 
-- `GET /user/songs` - Get user's liked songs
-- `PUT /user/info` - Update user profile
+- `GET /user/songs` 🔒 - Get user's liked songs
+- `GET /user/info` 🔒 - Get user profile
+- `PUT /user/info` 🔒 - Update user profile
 
 ## 🎨 Frontend Pages
 
@@ -164,11 +175,11 @@ The application comes with pre-seeded data including:
 
 ## 🌟 Key Features
 
-### Dynamic User Management
+### Accounts
 
-- No hardcoded user IDs
-- Automatic user detection
-- Support for multiple users
+- Sign up and log in from the `/login` page
+- Liked songs, followed artists, and profile belong to the logged-in user
+- Private pages redirect to login and return afterwards
 
 ### Real-time Search
 
@@ -185,10 +196,13 @@ The application comes with pre-seeded data including:
 
 ## 🔒 Security Notes
 
-- This is a demo application
-- No authentication implemented
-- Uses dynamic user selection for demo purposes
-- In production, implement proper authentication
+- Passwords are hashed with bcrypt (cost 12) and never returned by the API
+- Access tokens are HS256 JWTs signed with `JWT_SECRET`, expiring after `JWT_EXPIRES_IN` (default 1h); verification pins the algorithm, so unsigned (`alg: none`) tokens are rejected
+- Every user route reads the user from the token, so one account cannot read or change another's data
+- Login returns the same error for an unknown user and a wrong password, and rejects non-string input to block NoSQL operator injection
+- `/auth` routes are rate limited to 10 attempts per IP every 15 minutes
+- The server refuses to start without `JWT_SECRET`, and hashes any plaintext passwords left from older versions on startup
+- The frontend keeps the token in `localStorage`; a production app might prefer an httpOnly cookie to limit exposure to XSS
 
 ## 🚀 Deployment
 

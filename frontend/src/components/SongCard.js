@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -12,13 +13,25 @@ import {
 import { Favorite, FavoriteBorder, PersonAdd } from "@mui/icons-material";
 import { apiService } from "../services/api";
 import { placeholderImage, fallbackOnError } from "../services/placeholder";
+import { useAuth } from "../auth/AuthContext";
 
 const SongCard = ({ song, onLike, onFollowArtist }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Liking and following need an account, so send visitors to log in first
+  const requireLogin = () => {
+    if (user) return false;
+    navigate("/login", { state: { from: location } });
+    return true;
+  };
 
   const handleLike = async () => {
+    if (requireLogin()) return;
     try {
       setLoading(true);
       await apiService.likeSong(song._id);
@@ -32,6 +45,7 @@ const SongCard = ({ song, onLike, onFollowArtist }) => {
   };
 
   const handleFollowArtist = async () => {
+    if (requireLogin()) return;
     try {
       setLoading(true);
       await apiService.followArtist(song.artist._id);

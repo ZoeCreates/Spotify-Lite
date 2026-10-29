@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { Person, Save } from "@mui/icons-material";
 import { apiService } from "../services/api";
+import { useAuth } from "../auth/AuthContext";
 
 const UserProfile = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const UserProfile = () => {
     password: "",
   });
   const [userInfo, setUserInfo] = useState(null);
+  const { setUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -66,6 +68,8 @@ const UserProfile = () => {
       setSuccess("");
 
       const response = await apiService.updateUserProfile(updateData);
+      setUserInfo(response.data);
+      setUser(response.data);
       setSuccess("Profile updated successfully!");
 
       // Clear password field after successful update

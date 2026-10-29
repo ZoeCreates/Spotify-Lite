@@ -1,10 +1,20 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
-import { Link as RouterLink, useLocation } from "react-router-dom";
-import { MusicNote, Search, Person, Favorite } from "@mui/icons-material";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import {
+  MusicNote,
+  Search,
+  Person,
+  Favorite,
+  Login,
+  Logout,
+} from "@mui/icons-material";
+import { useAuth } from "../auth/AuthContext";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const navItems = [
     { path: "/", label: "Home", icon: <MusicNote /> },
@@ -46,6 +56,29 @@ const Navbar = () => {
               {item.label}
             </Button>
           ))}
+          {user ? (
+            <Button
+              startIcon={<Logout />}
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+              sx={{ color: "white" }}
+            >
+              Log out ({user.username})
+            </Button>
+          ) : (
+            <Button
+              component={RouterLink}
+              to="/login"
+              startIcon={<Login />}
+              sx={{
+                color: location.pathname === "/login" ? "#1DB954" : "white",
+              }}
+            >
+              Log in
+            </Button>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

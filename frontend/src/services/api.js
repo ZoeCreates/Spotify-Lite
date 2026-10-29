@@ -5,6 +5,14 @@ import axios from "axios";
 const API_BASE_URL =
   process.env.REACT_APP_API_URL ?? "http://localhost:5001";
 
+const TOKEN_KEY = "spotifyLiteToken";
+
+export const tokenStore = {
+  get: () => localStorage.getItem(TOKEN_KEY),
+  set: (token) => localStorage.setItem(TOKEN_KEY, token),
+  clear: () => localStorage.removeItem(TOKEN_KEY),
+};
+
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,8 +21,47 @@ const api = axios.create({
   },
 });
 
+// Send the JWT with every request once the user has logged in
+api.interceptors.request.use((config) => {
+  const token = tokenStore.get();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// An expired or invalid token logs the user out everywhere
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && tokenStore.get()) {
+      tokenStore.clear();
+      window.dispatchEvent(new Event("auth:logout"));
+    }
+    return Promise.reject(error);
+  }
+);
+
 // API functions
 export const apiService = {
+  // Auth APIs
+  login: async (identifier, password) => {
+    const response = await api.post("/auth/login", { identifier, password });
+    return response.data;
+  },
+
+  register: async (username, email, password) => {
+    const response = await api.post("/auth/register", {
+      username,
+      email,
+      password,
+    });
+    return response.data;
+  },
+
+  getMe: async () => {
+    const response = await api.get("/auth/me");
+    return response.data;
+  },
+
   // Song APIs
   searchSongs: async (query, genre, language) => {
     const params = {};
@@ -38,21 +85,18 @@ export const apiService = {
   },
 
   // User APIs
-  getUserLikedSongs: async (username) => {
-    const params = username ? { username } : {};
-    const response = await api.get("/user/songs", { params });
+  getUserLikedSongs: async () => {
+    const response = await api.get("/user/songs");
     return response.data;
   },
 
-  updateUserProfile: async (userData, username) => {
-    const params = username ? { username } : {};
-    const response = await api.put("/user/info", userData, { params });
+  updateUserProfile: async (userData) => {
+    const response = await api.put("/user/info", userData);
     return response.data;
   },
 
-  getUserInfo: async (username) => {
-    const params = username ? { username } : {};
-    const response = await api.get("/user/info", { params });
+  getUserInfo: async () => {
+    const response = await api.get("/user/info");
     return response.data;
   },
 
